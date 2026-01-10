@@ -15,40 +15,46 @@ import {
   Bell,
   InstagramLogo,
   YoutubeLogo,
-  LinkedinLogo
+  LinkedinLogo,
+  User
 } from '@phosphor-icons/react';
 
 function App() {
-  // --- Estados de Dados e Navegação ---
+  // --- PEGA A URL BASE (Seja localhost ou /medcof/) ---
+  const baseUrl = import.meta.env.BASE_URL;
+
+  // --- Estados e Dados ---
   const [activeModuleId, setActiveModuleId] = useState(modulesData[0]?.id || 1);
+  
   const [lastSession, setLastSession] = useState({ 
     moduleId: 1, 
     submoduleIndex: 0, 
     title: modulesData[0]?.submodules?.[0]?.title || "Introdução"
   });
-  const [activeModuleData, setActiveModuleData] = useState(modulesData[0] || {});
   
-  // --- Estados de Interface ---
+  const [activeModuleData, setActiveModuleData] = useState(modulesData[0] || {});
   const [searchQuery, setSearchQuery] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  // Estado para controlar qual link do menu superior está ativo (branco)
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [activeNavLink, setActiveNavLink] = useState('Home');
-
+  
   const swiperRef = useRef(null);
 
-  // Atualiza dados do módulo ativo
+  // Atualiza os dados quando o módulo muda
   useEffect(() => {
     const found = modulesData.find(m => m.id === activeModuleId);
     if (found) setActiveModuleData(found);
   }, [activeModuleId]);
 
-  // Função "Continuar de onde parei"
+  // Função para continuar de onde parou
   const handleContinueSession = () => {
     setActiveModuleId(lastSession.moduleId);
+    
     if (swiperRef.current) {
         const moduleIndex = modulesData.findIndex(m => m.id === lastSession.moduleId);
         if (moduleIndex >= 0) swiperRef.current.slideToLoop(moduleIndex);
     }
+
     setTimeout(() => {
       const cardId = `submodule-${lastSession.moduleId}-${lastSession.submoduleIndex}`;
       const element = document.getElementById(cardId);
@@ -60,7 +66,6 @@ function App() {
     }, 300);
   };
 
-  // Lógica de Busca
   const getFilteredSubmodules = () => {
     if (searchQuery.length < 2) return null;
     let results = [];
@@ -82,12 +87,10 @@ function App() {
   const searchResults = getFilteredSubmodules();
   const displayingSubmodules = searchResults ? searchResults : (activeModuleData.submodules || []);
 
-  // Estatísticas Seguras
   const statsMaterials = activeModuleData?.stats?.materials || 0;
   const statsFlashcards = activeModuleData?.stats?.flashcards || 0;
   const statsSubmodules = activeModuleData?.submodules ? activeModuleData.submodules.length : 0;
 
-  // Clique no Carrossel
   const handleSlideClick = (mod, index) => {
     setActiveModuleId(mod.id);
     if (swiperRef.current) {
@@ -95,19 +98,15 @@ function App() {
     }
   };
 
-  // Lista de links do menu para facilitar a renderização
   const navLinksList = ['Home', 'Acompanhamento', 'Cronograma', 'Material de Apoio', 'QBank'];
 
   return (
     <div className="min-h-screen flex flex-col relative bg-[#020617] text-slate-50 font-sans">
       
-      {/* =================================================================================
-          CABEÇALHO (HEADER) - Visual Ajustado
-      ================================================================================== */}
+      {/* ================= HEADER ================= */}
       <header className="bg-[#0b1121] border-b border-slate-800 px-6 py-3 z-50 sticky top-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-8">
-            {/* Logo (Sem roxo, apenas azul e branco/cinza) */}
             <div className="flex items-center gap-2 cursor-pointer group">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold italic group-hover:scale-110 transition text-white">
                     E
@@ -117,7 +116,6 @@ function App() {
                 </span>
             </div>
             
-            {/* Nav Links (Cinza -> Branco ao clicar) */}
             <nav className="hidden lg:flex gap-6 text-sm font-medium">
               {navLinksList.map((link) => (
                 <a 
@@ -133,7 +131,6 @@ function App() {
           </div>
 
           <div className="flex-1 flex justify-end md:justify-end gap-4">
-             {/* Dropdown Curso */}
              <div className="relative">
                 <button 
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -172,26 +169,40 @@ function App() {
                 )}
              </div>
              
-             {/* Ícones (Sino e Perfil - Estilo da Imagem 3/HTML original) */}
              <div className="flex items-center gap-4 border-l border-slate-700 pl-4 relative">
-                {/* Sino com notificação vermelha */}
                 <div className="relative cursor-pointer hover:bg-white/5 p-2 rounded-full transition">
                     <Bell size={20} className="text-gray-300" />
                     <span className="absolute top-1.5 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-[#020617]"></span>
                 </div>
 
-                {/* Círculo de Perfil com gradiente e sombra */}
-                <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center text-xs font-bold border-2 border-[#1e293b] cursor-pointer hover:scale-105 transition shadow-lg shadow-purple-500/20 text-white">
-                    US
+                <div className="relative">
+                    <div 
+                        onClick={() => setIsProfileOpen(!isProfileOpen)}
+                        className="w-9 h-9 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center text-xs font-bold border-2 border-[#1e293b] cursor-pointer hover:scale-105 transition shadow-lg shadow-purple-500/20 text-white select-none"
+                    >
+                        NA
+                    </div>
+
+                    {isProfileOpen && (
+                        <div className="absolute top-full right-0 mt-3 w-56 bg-[#0f172a] border border-slate-700 rounded-xl shadow-2xl z-[100] p-2 overflow-hidden animate-fade-in">
+                            <a href="#" className="flex items-center gap-3 px-3 py-2 text-sm text-slate-300 hover:bg-slate-800/50 hover:text-white rounded-lg transition-colors border-b border-slate-800 mb-1 pb-2">
+                                <User size={16} />
+                                Meu Perfil
+                            </a>
+                            <a href="#" className="block px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors">Acompanhamento</a>
+                            <a href="#" className="block px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors">Cronograma</a>
+                            <a href="#" className="block px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors">Material de Apoio</a>
+                            <a href="#" className="block px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors">QBank</a>
+                            <a href="#" className="block px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors text-red-400 hover:text-red-300 mt-2 border-t border-slate-800 pt-2">Sair</a>
+                        </div>
+                    )}
                 </div>
              </div>
           </div>
         </div>
       </header>
 
-      {/* =================================================================================
-          BARRA DE AÇÕES (PESQUISA + BOTÕES)
-      ================================================================================== */}
+      {/* ================= BARRA DE AÇÕES ================= */}
       <div className="w-full bg-[#020617] px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-4 z-40 relative">
         <div className="relative w-full md:w-[480px]">
            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -237,12 +248,15 @@ function App() {
         </button>
       </div>
 
-      {/* =================================================================================
-          HERO DASHBOARD
-      ================================================================================== */}
+      {/* ================= HERO DASHBOARD ================= */}
       <section className="relative w-full overflow-hidden group border-b border-slate-800 pb-0">
-         <div className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-all duration-500 transform group-hover:scale-105"
-              style={{ backgroundImage: "url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop')" }}>
+         <div className="absolute inset-0 w-full h-full bg-[#020617]">
+            <div className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500 transform group-hover:scale-105"
+                 style={{ 
+                     backgroundImage: "url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop')",
+                     opacity: 0.4 
+                 }}>
+            </div>
             <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/80 to-transparent"></div>
             <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#020617] to-transparent"></div>
          </div>
@@ -269,10 +283,14 @@ function App() {
 
                 <div className="hidden lg:w-1/3 h-full flex flex-col justify-end lg:justify-center items-center pointer-events-none mt-6 lg:mt-0">
                     <div className="relative robot-float pointer-events-auto">
+                        {/* IMPORTANTE: O caminho usa ${baseUrl} para funcionar no GitHub Pages 
+                           e assets/modules/robo.png para funcionar localmente.
+                        */}
                         <img 
-                            src={`assets/modules/robo.png`}
+                            src={`${baseUrl}assets/modules/robo.png`} 
                             onError={(e) => {
                                 e.target.style.display='none';
+                                console.warn("Imagem do robô não encontrada.");
                             }}
                             alt="Robô Cofbot" 
                             className="w-64 h-auto object-contain drop-shadow-2xl" 
@@ -299,9 +317,7 @@ function App() {
          </div>
       </section>
 
-      {/* =================================================================================
-          SELEÇÃO DE MÓDULOS (INFINITO)
-      ================================================================================== */}
+      {/* ================= SELEÇÃO DE MÓDULOS (INFINITO) ================= */}
       <div className="w-full bg-[#020617] pt-0 pb-12 relative z-30">
         <div className="w-full max-w-7xl mx-auto px-4 mt-10">
             <Swiper
@@ -329,8 +345,9 @@ function App() {
                                     </div>
                                 </div>
                                 <div className="robot-wrapper">
+                                    {/* ROBÔ NO CARD */}
                                     <img 
-                                        src="assets/modules/robo.png" 
+                                        src={`${baseUrl}assets/modules/robo.png`} 
                                         onError={(e) => e.target.style.display='none'} 
                                         alt="" 
                                         className="robot-img" 
@@ -344,7 +361,7 @@ function App() {
             </Swiper>
         </div>
 
-        {/* --- GRID DE SUBMÓDULOS --- */}
+        {/* ================= GRID DE SUBMÓDULOS (LINKS) ================= */}
         <div className="w-full bg-slate-900/50 border-t border-slate-800 min-h-[400px] py-12 relative z-40 mt-6">
             <div className="max-w-6xl mx-auto px-6" id="submodules-section">
                 
@@ -362,15 +379,13 @@ function App() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {displayingSubmodules.length === 0 ? (
+                    {(!displayingSubmodules || displayingSubmodules.length === 0) ? (
                         <p className="col-span-full text-center text-slate-500">Nenhum conteúdo encontrado.</p>
                     ) : (
                         displayingSubmodules.map((sub, idx) => (
                             <a 
-                                key={idx} 
-                                href={sub.link || "#"} // Lê o link do data.js
-                                // target="_blank" // Tire esse comentário se quiser abrir em nova aba
-                                // rel="noopener noreferrer" // Segurança para nova aba
+                                key={idx}
+                                href={sub.link || "#"}
                                 className="submodule-card rounded-xl p-5 relative overflow-hidden group cursor-pointer block text-left"
                                 onClick={() => setLastSession({
                                     moduleId: activeModuleId,
@@ -378,8 +393,9 @@ function App() {
                                     title: sub.title
                                 })}
                             >
+                                {/* WALLPAPER DO CARD - CAMINHO CORRIGIDO */}
                                 <img 
-                                    src={`assets/wallpapers/mod-${activeModuleId}-sub-${idx}.png`} 
+                                    src={`${baseUrl}assets/wallpapers/mod-${activeModuleId}-sub-${idx}.png`} 
                                     className="card-bg-image" 
                                     alt="Background"
                                     onError={(e) => {
@@ -420,9 +436,7 @@ function App() {
         </div>
       </div>
 
-      {/* =================================================================================
-          RODAPÉ (FOOTER)
-      ================================================================================== */}
+      {/* ================= RODAPÉ ================= */}
       <footer className="bg-[#0b1121] border-t border-slate-800 pt-10 pb-10 mt-auto">
         <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col md:flex-row justify-between items-center gap-8">
