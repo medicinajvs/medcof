@@ -445,8 +445,8 @@ function App() {
                                 {/* 🆕 CAMADA 5: LOGO "R+CM" (SUBSTITUINDO USA) */}
                                 <div className="absolute top-3 right-4 z-20 opacity-80 group-hover:opacity-100 transition-opacity">
                                     <div className="flex items-center gap-0.5 font-bold text-lg tracking-tighter select-none">
-                                        <span className="text-slate-300">R</span>
-                                        <span className="text-red-500">+CM</span>
+                                        <span className="text-slate-300">USA</span>
+                                        <span className="text-red-500">USMLE</span>
                                     </div>
                                 </div>
                             </a>
