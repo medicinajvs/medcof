@@ -283,9 +283,6 @@ function App() {
 
                 <div className="hidden lg:w-1/3 h-full flex flex-col justify-end lg:justify-center items-center pointer-events-none mt-6 lg:mt-0">
                     <div className="relative robot-float pointer-events-auto">
-                        {/* IMPORTANTE: O caminho usa ${baseUrl} para funcionar no GitHub Pages 
-                           e assets/modules/robo.png para funcionar localmente.
-                        */}
                         <img 
                             src={`${baseUrl}assets/modules/robo.png`} 
                             onError={(e) => {
@@ -361,9 +358,12 @@ function App() {
             </Swiper>
         </div>
 
-        {/* ================= GRID DE SUBMÓDULOS (LINKS) ================= */}
+        {/* ========================================================================= */}
+        {/* ================= GRID DE SUBMÓDULOS - 3 COLUNAS + ROBÔ + R+CM ================= */}
+        {/* ========================================================================= */}
+        
         <div className="w-full bg-slate-900/50 border-t border-slate-800 min-h-[400px] py-12 relative z-40 mt-6">
-            <div className="max-w-6xl mx-auto px-6" id="submodules-section">
+            <div className="max-w-7xl mx-auto px-6" id="submodules-section">
                 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 border-b border-slate-800 pb-6">
                     <div>
@@ -378,7 +378,8 @@ function App() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* GRID DE 3 COLUNAS (lg:grid-cols-3) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {(!displayingSubmodules || displayingSubmodules.length === 0) ? (
                         <p className="col-span-full text-center text-slate-500">Nenhum conteúdo encontrado.</p>
                     ) : (
@@ -386,46 +387,66 @@ function App() {
                             <a 
                                 key={idx}
                                 href={sub.link || "#"}
-                                className="submodule-card rounded-xl p-5 relative overflow-hidden group cursor-pointer block text-left"
                                 onClick={() => setLastSession({
                                     moduleId: activeModuleId,
                                     submoduleIndex: idx,
                                     title: sub.title
                                 })}
+                                // CARD MENOR (h-48) E COMPACTO COM GRADIENTE PADRÃO
+                                className="group relative w-full h-48 rounded-2xl overflow-hidden shadow-2xl cursor-pointer bg-gradient-to-r from-[#5B1B6F] via-[#4B237C] to-[#1F2A5A] transition-all duration-300 hover:scale-[1.01] hover:shadow-purple-900/30 border border-white/5"
                             >
-                                {/* WALLPAPER DO CARD - CAMINHO CORRIGIDO */}
-                                <img 
-                                    src={`${baseUrl}assets/wallpapers/mod-${activeModuleId}-sub-${idx}.png`} 
-                                    className="card-bg-image" 
-                                    alt="Background"
-                                    onError={(e) => {
-                                        e.target.src = `https://source.unsplash.com/featured/?medical,abstract&sig=${idx}`
+                                {/* 🔴 CAMADA 1: FORMA GEOMÉTRICA VERMELHA */}
+                                <div className="absolute -left-12 top-1/2 -translate-y-1/2 w-52 h-52 rounded-full bg-[#9B0D1A] blur-[1px] opacity-90 shadow-2xl z-0 transition-transform duration-700 group-hover:scale-110"></div>
+
+                                {/* 🤖 CAMADA 2: O ROBÔ (SUBSTITUINDO O HUMANO) */}
+                                <img
+                                    src={`${baseUrl}assets/modules/robo.png`} 
+                                    alt="Robô Cofbot"
+                                    className="absolute left-1 bottom-1 h-[80%] w-auto object-contain z-10 filter drop-shadow-xl transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6 origin-bottom"
+                                    onError={(e) => e.target.style.display='none'}
+                                />
+
+                                {/* 🧬 CAMADA 3: TEXTURA ABSTRATA (FUNDO DIREITA) */}
+                                <div 
+                                    className="absolute right-0 top-0 h-full w-2/3 opacity-10 mix-blend-overlay z-0 bg-contain bg-no-repeat bg-right-top"
+                                    style={{ 
+                                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E")` 
                                     }}
                                 />
-                                <div className="card-overlay"></div>
                                 
-                                <div className="card-content-wrapper">
-                                    <div className="flex items-start justify-between mb-3 relative z-10">
-                                        <span className="text-[10px] font-bold text-white bg-blue-600/80 px-2 py-0.5 rounded uppercase tracking-wider">
-                                            {`SUBMÓDULO ${idx + 1}`}
+                                {/* 🌫️ CAMADA FOSCA (MATTE) - Efeito de vidro atrás do texto */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0f102a]/60 to-[#0f102a]/95 z-10 backdrop-blur-[1px]"></div>
+
+                                {/* ✍️ CAMADA 4: TEXTO (ALINHAMENTO COM ML) */}
+                                <div className="relative z-20 ml-[38%] h-full flex flex-col justify-center pr-4 py-3">
+                                    
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                        <span className="text-[9px] font-bold text-blue-200 bg-blue-900/40 px-2 py-0.5 rounded border border-blue-500/30 uppercase tracking-widest">
+                                            {`Módulo ${idx + 1}`}
                                         </span>
                                     </div>
+
+                                    <h3 className="text-xl font-bold text-white leading-tight drop-shadow-md mb-2 tracking-tight group-hover:text-blue-100 transition-colors">
+                                        {sub.title}
+                                    </h3>
                                     
-                                    <div className="play-overlay">
-                                       <Play size={32} weight="fill" color="white" />
-                                    </div>
-                                    
-                                    <div className="mt-auto relative z-10">
-                                        <h4 className="text-lg font-bold text-white mb-1 leading-tight drop-shadow-md group-hover:text-blue-400 transition-colors">
-                                            {sub.title}
-                                        </h4>
-                                        <div className="flex items-center justify-between mt-2">
-                                            <p className="text-slate-300 text-xs line-clamp-1 opacity-80 w-2/3">{sub.desc}</p>
-                                            <div className="flex items-center gap-1 text-xs font-medium text-white bg-black/60 px-2 py-1 rounded backdrop-blur-md">
-                                                <Clock weight="fill" /> 
-                                                <span>{sub.duration}</span>
-                                            </div>
+                                    <p className="text-blue-100/70 text-[10px] font-medium line-clamp-2 leading-relaxed mb-3">
+                                        {sub.desc || "Domine os conceitos fundamentais com metodologia focada."}
+                                    </p>
+
+                                    <div className="flex items-center gap-3 mt-auto">
+                                        <div className="flex items-center gap-1 text-[10px] font-bold text-white/90 bg-black/20 px-2.5 py-1 rounded-full backdrop-blur-sm border border-white/10">
+                                            <Clock weight="fill" className="text-blue-400" size={12} />
+                                            <span>{sub.duration}</span>
                                         </div>
+                                    </div>
+                                </div>
+
+                                {/* 🆕 CAMADA 5: LOGO "R+CM" (SUBSTITUINDO USA) */}
+                                <div className="absolute top-3 right-4 z-20 opacity-80 group-hover:opacity-100 transition-opacity">
+                                    <div className="flex items-center gap-0.5 font-bold text-lg tracking-tighter select-none">
+                                        <span className="text-slate-300">R</span>
+                                        <span className="text-red-500">+CM</span>
                                     </div>
                                 </div>
                             </a>
